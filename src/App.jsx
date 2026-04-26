@@ -186,8 +186,6 @@ export default function App() {
     const voice = getPreferredVoice(type);
     if (voice) utterance.voice = voice;
     utterance.lang = type === "telugu" ? "te-IN" : "en-IN";
-    utterance.rate = type === "telugu" ? 0.82 : 0.8;
-    utterance.pitch = type === "telugu" ? 1.05 : 0.45;
     utterance.volume = 1;
     return utterance;
   };
