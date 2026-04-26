@@ -50,6 +50,11 @@ function scoreVoice(voice, type) {
   return score;
 }
 
+function soundsFemaleVoice(voice) {
+  const name = voice.name.toLowerCase();
+  return name.includes("female") || name.includes("woman") || name.includes("girl") || name.includes("zira") || name.includes("samantha");
+}
+
 function formatDuration(totalSeconds) {
   const seconds = Math.max(Math.round(totalSeconds), 0);
   const hours = Math.floor(seconds / 3600);
@@ -87,7 +92,7 @@ export default function App() {
   const [weakWords, setWeakWords] = useState(() => loadArray("sscWeakWords"));
   const [streak, setStreak] = useState(() => Number(localStorage.getItem("sscStreak") || "0"));
   const [lastStudy, setLastStudy] = useState(() => localStorage.getItem("sscLastStudy") || "");
-  const [autoSpeak, setAutoSpeak] = useState(() => localStorage.getItem("sscAutoSpeak") !== "false");
+  const [autoSpeak, setAutoSpeak] = useState(() => localStorage.getItem("sscAutoSpeak") === "true");
   const [voices, setVoices] = useState([]);
   const [wordVoice, setWordVoice] = useState(() => localStorage.getItem("sscWordVoice") || "");
   const [teluguVoice, setTeluguVoice] = useState(() => localStorage.getItem("sscTeluguVoice") || "");
@@ -166,7 +171,7 @@ export default function App() {
   const getPreferredVoice = (type) => {
     const savedVoice = type === "word" ? wordVoice : teluguVoice;
     const exact = voices.find(v => v.name === savedVoice);
-    if (exact) return exact;
+    if (exact && (type !== "word" || !soundsFemaleVoice(exact))) return exact;
 
     const scored = voices
       .map(voice => ({ voice, score: scoreVoice(voice, type) }))
@@ -181,8 +186,8 @@ export default function App() {
     const voice = getPreferredVoice(type);
     if (voice) utterance.voice = voice;
     utterance.lang = type === "telugu" ? "te-IN" : "en-IN";
-    utterance.rate = type === "telugu" ? 0.82 : 0.86;
-    utterance.pitch = type === "telugu" ? 1.05 : 0.72;
+    utterance.rate = type === "telugu" ? 0.82 : 0.8;
+    utterance.pitch = type === "telugu" ? 1.05 : 0.45;
     utterance.volume = 1;
     return utterance;
   };
