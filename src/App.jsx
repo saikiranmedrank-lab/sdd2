@@ -93,6 +93,7 @@ export default function App() {
   const [autoNext, setAutoNext] = useState(false);
   const [secondsPerWord, setSecondsPerWord] = useState(() => Number(localStorage.getItem("sscSecondsPerWord") || "10"));
   const activeQueueRef = useRef(null);
+  const speechQueueRef = useRef([]);
 
   const chapters = useMemo(() => ["All", ...new Set(allWords.map(v => v.chapter))], [allWords]);
 
@@ -174,21 +175,48 @@ export default function App() {
     return scored[0]?.voice || null;
   };
 
-  const speakText = (text, type) => {
-    if (!("speechSynthesis" in window)) return;
+  const createUtterance = (text, type) => {
     const utterance = new SpeechSynthesisUtterance(text);
     const voice = getPreferredVoice(type);
     if (voice) utterance.voice = voice;
     utterance.lang = type === "telugu" ? "te-IN" : "en-IN";
     utterance.rate = type === "telugu" ? 0.82 : 0.86;
+    utterance.volume = 1;
+    return utterance;
+  };
+
+  const speakText = (text, type) => {
+    if (!("speechSynthesis" in window)) return;
+    const utterance = createUtterance(text, type);
+    speechQueueRef.current = [utterance];
+    window.speechSynthesis.resume();
     window.speechSynthesis.speak(utterance);
   };
 
   const speakCurrent = () => {
     if (!("speechSynthesis" in window)) return;
     window.speechSynthesis.cancel();
-    speakText(current.word, "word");
-    if (current.telugu) speakText(current.telugu, "telugu");
+    window.speechSynthesis.resume();
+
+    const wordUtterance = createUtterance(current.word, "word");
+    const teluguUtterance = current.telugu ? createUtterance(current.telugu, "telugu") : null;
+    speechQueueRef.current = teluguUtterance ? [wordUtterance, teluguUtterance] : [wordUtterance];
+
+    if (teluguUtterance) {
+      let teluguStarted = false;
+      const speakTelugu = () => {
+        if (teluguStarted) return;
+        teluguStarted = true;
+        window.speechSynthesis.resume();
+        window.speechSynthesis.speak(teluguUtterance);
+      };
+
+      wordUtterance.onend = speakTelugu;
+      wordUtterance.onerror = speakTelugu;
+      window.setTimeout(speakTelugu, 1400);
+    }
+
+    window.speechSynthesis.speak(wordUtterance);
   };
 
   useEffect(() => {
