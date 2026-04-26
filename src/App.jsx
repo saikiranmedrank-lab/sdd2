@@ -88,6 +88,7 @@ export default function App() {
   const [options, setOptions] = useState(getOptions(vocab[0], vocab));
   const [selected, setSelected] = useState(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
+  const [restoreWord, setRestoreWord] = useState(null);
   const [learned, setLearned] = useState(() => loadArray("sscLearnedWords"));
   const [weakWords, setWeakWords] = useState(() => loadArray("sscWeakWords"));
   const [streak, setStreak] = useState(() => Number(localStorage.getItem("sscStreak") || "0"));
@@ -100,6 +101,7 @@ export default function App() {
   const [secondsPerWord, setSecondsPerWord] = useState(() => Number(localStorage.getItem("sscSecondsPerWord") || "10"));
   const activeQueueRef = useRef(null);
   const speechQueueRef = useRef([]);
+  const preSearchWordRef = useRef(null);
 
   const chapters = useMemo(() => ["All", ...new Set(allWords.map(v => v.chapter))], [allWords]);
 
@@ -154,6 +156,32 @@ export default function App() {
   const leftCount = Math.max(filtered.length - doneCount, 0);
   const estimatedTotalTime = formatDuration(filtered.length * secondsPerWord);
   const estimatedRemainingTime = formatDuration(leftCount * secondsPerWord);
+
+  const handleSearchChange = (event) => {
+    const nextQuery = event.target.value;
+
+    if (!query && nextQuery && current?.word) {
+      preSearchWordRef.current = current.word;
+    }
+
+    setQuery(nextQuery);
+
+    if (!nextQuery) {
+      const wordToRestore = preSearchWordRef.current;
+      preSearchWordRef.current = null;
+      if (wordToRestore) setRestoreWord(wordToRestore);
+      return;
+    }
+
+    setIndex(0);
+  };
+
+  useEffect(() => {
+    if (!restoreWord) return;
+    const nextIndex = filtered.findIndex(item => item.word === restoreWord);
+    if (nextIndex >= 0) setIndex(nextIndex);
+    setRestoreWord(null);
+  }, [filtered, restoreWord]);
 
   useEffect(() => {
     if (window.matchMedia("(max-width: 1040px)").matches) return;
@@ -400,7 +428,7 @@ export default function App() {
                 </select>
                 <input
                   value={query}
-                  onChange={e => { setQuery(e.target.value); setIndex(0); }}
+                  onChange={handleSearchChange}
                   placeholder="Search word, meaning, Telugu..."
                   className="input"
                 />
