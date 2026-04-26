@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import vocab from "./vocab.json";
+import vocab from "./vocabData";
 import "./App.css";
 
 const pdfRecheckPatch = [];
