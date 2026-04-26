@@ -787,7 +787,7 @@ button.metric {
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  padding: 20px 22px;
+  padding: 20px 78px 20px 22px;
   min-height: 0;
 }
 
@@ -847,6 +847,14 @@ button.metric {
 .quiz-settings-button:hover {
   border-color: #2563eb;
   color: #1d4ed8;
+}
+
+.quiz-settings-top {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 3;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
 }
 
 .quiz-settings-overlay {

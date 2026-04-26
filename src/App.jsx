@@ -575,6 +575,8 @@ export default function App() {
           </section>
         ) : (
           <section className="panel quiz-panel">
+            <button type="button" className="quiz-settings-button quiz-settings-top" onClick={() => setQuizSettingsOpen(true)} aria-label="Open quiz settings">⚙</button>
+
             {selected === quiz?.word && (
               <div className="paper-flyers" aria-hidden="true">
                 {Array.from({ length: 18 }, (_, item) => (
@@ -599,7 +601,6 @@ export default function App() {
                   </div>
                   <div className="quiz-meta">
                     <div className="score-pill">{score.correct}/{score.total}</div>
-                    <button type="button" className="quiz-settings-button" onClick={() => setQuizSettingsOpen(true)} aria-label="Open quiz settings">⚙</button>
                   </div>
                 </div>
 
