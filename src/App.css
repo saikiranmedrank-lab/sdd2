@@ -826,14 +826,44 @@ button.metric {
 
 .quiz-meta {
   display: grid;
-  grid-template-columns: minmax(130px, 180px) auto;
+  grid-template-columns: auto auto;
   gap: 10px;
   align-items: center;
 }
 
-.quiz-filter {
-  min-height: 42px;
-  border-radius: 999px;
+.quiz-settings-button {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 50%;
+  background: #fff;
+  color: #172033;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.quiz-settings-button:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.quiz-settings-overlay {
+  display: grid;
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(15, 23, 42, 0.42);
+  padding: 16px;
+  overflow: auto;
+}
+
+.quiz-settings-card {
+  align-self: start;
+  justify-self: end;
+  width: min(380px, 100%);
+  margin-top: 16px;
 }
 
 .options-grid {

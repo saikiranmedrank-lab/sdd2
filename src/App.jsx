@@ -35,9 +35,9 @@ function scoreVoice(voice, type) {
     if (lang === "en-in") score += 60;
     if (lang.startsWith("en")) score += 25;
     if (name.includes("ravi") || name.includes("kunal") || name.includes("hemant")) score += 35;
+    if (name.includes("male") || name.includes("man") || name.includes("guy")) score += 45;
     if (name.includes("india") || name.includes("indian")) score += 20;
-    if (name.includes("male")) score += 10;
-    if (name.includes("female")) score -= 20;
+    if (name.includes("female") || name.includes("woman") || name.includes("girl")) score -= 90;
     return score;
   }
 
@@ -77,6 +77,7 @@ export default function App() {
   const [chapter, setChapter] = useState("All");
   const [index, setIndex] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [quizSettingsOpen, setQuizSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [quiz, setQuiz] = useState(vocab[0]);
   const [options, setOptions] = useState(getOptions(vocab[0], vocab));
@@ -181,6 +182,7 @@ export default function App() {
     if (voice) utterance.voice = voice;
     utterance.lang = type === "telugu" ? "te-IN" : "en-IN";
     utterance.rate = type === "telugu" ? 0.82 : 0.86;
+    utterance.pitch = type === "telugu" ? 1.05 : 0.72;
     utterance.volume = 1;
     return utterance;
   };
@@ -596,12 +598,35 @@ export default function App() {
                     <h2>{quiz.simple}</h2>
                   </div>
                   <div className="quiz-meta">
-                    <select value={chapter} onChange={e => { setChapter(e.target.value); setIndex(0); }} className="input quiz-filter" aria-label="Quiz chapter">
-                      {chapters.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
                     <div className="score-pill">{score.correct}/{score.total}</div>
+                    <button type="button" className="quiz-settings-button" onClick={() => setQuizSettingsOpen(true)} aria-label="Open quiz settings">⚙</button>
                   </div>
                 </div>
+
+                {quizSettingsOpen && (
+                  <div className="mobile-settings quiz-settings-overlay" role="dialog" aria-modal="true" aria-label="Quiz settings">
+                    <div className="mobile-settings-card quiz-settings-card">
+                      <div className="settings-header">
+                        <div>
+                          <p className="eyebrow">Quiz settings</p>
+                          <h2>Practice set</h2>
+                        </div>
+                        <button type="button" onClick={() => setQuizSettingsOpen(false)} aria-label="Close quiz settings">×</button>
+                      </div>
+
+                      <label className="setting-field">
+                        <span>Chapter</span>
+                        <select value={chapter} onChange={e => { setChapter(e.target.value); setIndex(0); setSelected(null); }} className="input">
+                          {chapters.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </label>
+
+                      <button type="button" className="primary" onClick={() => { setQuizSettingsOpen(false); nextQuiz(); }}>
+                        Apply
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 <div className="options-grid">
                   {options.map(option => {
