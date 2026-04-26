@@ -510,13 +510,12 @@ export default function App() {
                     <span>{current.chapter}</span>
                     {learned.includes(current.word) && <span className="learned">Learned</span>}
                   </div>
-                  <div className="visual">{current.visual}</div>
                   <h2>{current.word}</h2>
                   <div className="answer-grid">
                     <Info label="Simple" text={current.simple} />
                     {/* <Info label="Hindi" text={current.hindi} /> */}
                     <Info label="Telugu" text={current.telugu} />
-                    <Info label="Memory trick" text={current.trick} wide />
+                    <Info label="Memory trick" text={current.trick} visual={current.visual} wide />
                     <Info label="Example" text={current.example} wide />
                   </div>
                 </article>
@@ -678,11 +677,18 @@ function Metric({ label, value, onClick }) {
   );
 }
 
-function Info({ label, text, wide = false }) {
+function Info({ label, text, visual, wide = false }) {
   return (
     <div className={wide ? "info wide" : "info"}>
       <span>{label}</span>
-      <p>{text}</p>
+      {visual ? (
+        <div className="trick-content">
+          <strong>{visual}</strong>
+          <p>{text}</p>
+        </div>
+      ) : (
+        <p>{text}</p>
+      )}
     </div>
   );
 }

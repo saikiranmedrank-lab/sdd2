@@ -507,6 +507,23 @@ button.metric {
   line-height: 1.55;
 }
 
+.trick-content {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.trick-content strong {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.trick-content p {
+  margin: 0;
+}
+
 .carousel-zone {
   position: absolute;
   top: 50%;
