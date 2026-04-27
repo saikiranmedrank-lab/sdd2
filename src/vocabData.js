@@ -1,4 +1,4 @@
-const vocab = [
+[
   {
     "chapter": "A-Words",
     "bookNo": 1,
@@ -29230,7 +29230,337 @@ const vocab = [
     "trick": "No sleep = zombie mode.",
     "example": "Without sleep you will become a zombie at work.",
     "pyqExams": []
+  },
+  [
+  {
+    "chapter": "I-Words",
+    "word": "Ignite",
+    "visual": "🔥🕯️",
+    "simple": "Kindle; light",
+    "hindi": "जलाना / प्रज्वलित करना",
+    "telugu": "వెలిగించడం / మండించడం",
+    "trick": "Ignite = start fire.",
+    "example": "Dry wood can ignite quickly.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Illuminate",
+    "visual": "💡✨",
+    "simple": "Brighten; decorate; floodlight",
+    "hindi": "प्रकाशित करना",
+    "telugu": "ప్రకాశింపజేయడం",
+    "trick": "Illuminate = fill with light.",
+    "example": "Street lamps illuminate the road.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Inflexible",
+    "visual": "🧱🚫",
+    "simple": "Rigid; cannot be bent",
+    "hindi": "कठोर / न झुकने वाला",
+    "telugu": "వంగని / కఠినమైన",
+    "trick": "Inflexible = cannot flex.",
+    "example": "He remained inflexible in policy.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Introspection",
+    "visual": "🧘🔍",
+    "simple": "Self-analysis",
+    "hindi": "आत्मनिरीक्षण",
+    "telugu": "ఆత్మపరిశీలన",
+    "trick": "Look inside yourself = introspection.",
+    "example": "Meditation encourages introspection.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Insurmountable",
+    "visual": "⛰️🚫",
+    "simple": "Impossible to overcome",
+    "hindi": "अजेय / दुर्गम",
+    "telugu": "అధిగమించలేని",
+    "trick": "Mountain you can't cross.",
+    "example": "They faced insurmountable odds.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Incur",
+    "visual": "💸😟",
+    "simple": "Bring upon oneself",
+    "hindi": "अपने ऊपर लेना",
+    "telugu": "తనపైకి తెచ్చుకోవడం",
+    "trick": "Incur = invite trouble.",
+    "example": "He incurred huge debts.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Industrious",
+    "visual": "🐜💪",
+    "simple": "Hard-working",
+    "hindi": "परिश्रमी",
+    "telugu": "కష్టపడి పనిచేసే",
+    "trick": "Like ants working always.",
+    "example": "She is an industrious learner.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Invigorate",
+    "visual": "⚡💪",
+    "simple": "Strengthen; energize",
+    "hindi": "शक्तिशाली बनाना",
+    "telugu": "శక్తివంతం చేయడం",
+    "trick": "Vigor means energy.",
+    "example": "Fresh air invigorates the mind.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "I-Words",
+    "word": "Incoherent",
+    "visual": "🌀🗣️",
+    "simple": "Unclear; confused",
+    "hindi": "अस्पष्ट / उलझा हुआ",
+    "telugu": "అస్పష్టమైన / గందరగోళమైన",
+    "trick": "No coherence = messy speech.",
+    "example": "He gave an incoherent reply.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "J-Words",
+    "word": "Jest",
+    "visual": "😂🎭",
+    "simple": "Joke; amusement",
+    "hindi": "मज़ाक",
+    "telugu": "జోకు / సరదా మాట",
+    "trick": "Jest = just joke.",
+    "example": "He said it in jest.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "J-Words",
+    "word": "Juggle",
+    "visual": "🤹🎾",
+    "simple": "Perform tricks with objects",
+    "hindi": "कलाबाज़ी करना",
+    "telugu": "వస్తువులతో విన్యాసాలు చేయడం",
+    "trick": "Juggler juggles balls.",
+    "example": "She can juggle five balls.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "J-Words",
+    "word": "Jape",
+    "visual": "😄🎭",
+    "simple": "Practical joke; witty remark",
+    "hindi": "हास्य मज़ाक",
+    "telugu": "చమత్కారమైన జోకు",
+    "trick": "Jape = joke with wit.",
+    "example": "His jape made everyone laugh.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "K-Words",
+    "word": "Kleptomania",
+    "visual": "👜🤏",
+    "simple": "Irresistible urge to steal",
+    "hindi": "चोरी की आदत",
+    "telugu": "దొంగతనం చేయాలనే అలవాటు",
+    "trick": "Klepto = stealing habit.",
+    "example": "The doctor treated her kleptomania.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "K-Words",
+    "word": "Kit",
+    "visual": "🎒🛠️",
+    "simple": "Set of articles; equipment",
+    "hindi": "सामान / किट",
+    "telugu": "సామగ్రి / కిట్",
+    "trick": "Toolkit = kit.",
+    "example": "Carry a first-aid kit.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "L-Words",
+    "word": "Laborious",
+    "visual": "🥵📚",
+    "simple": "Demanding much work; tedious",
+    "hindi": "कठिन / श्रमसाध्य",
+    "telugu": "శ్రమతో కూడిన",
+    "trick": "Labour needed = laborious.",
+    "example": "It was a laborious task.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "L-Words",
+    "word": "Labyrinth",
+    "visual": "🌀🏛️",
+    "simple": "Maze; confusing arrangement",
+    "hindi": "भूलभुलैया",
+    "telugu": "మేజ్ / చిక్కుముడి మార్గం",
+    "trick": "Labyrinth = lost in maze.",
+    "example": "We wandered through the labyrinth.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "M-Words",
+    "word": "Maestro",
+    "visual": "🎼🎻",
+    "simple": "Great musician or conductor",
+    "hindi": "महान संगीतज्ञ",
+    "telugu": "మహాన సంగీత విద్వాంసుడు",
+    "trick": "Master = maestro.",
+    "example": "The maestro led the orchestra.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "M-Words",
+    "word": "Morsel",
+    "visual": "🍞👌",
+    "simple": "Small piece of food",
+    "hindi": "निवाला",
+    "telugu": "చిన్న ముక్క ఆహారం",
+    "trick": "Small morsel to eat.",
+    "example": "He ate a morsel of bread.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "M-Words",
+    "word": "Mirage",
+    "visual": "🏜️💧",
+    "simple": "Optical illusion",
+    "hindi": "मृगतृष्णा",
+    "telugu": "మిరేజ్ / మాయ నీరు",
+    "trick": "Desert false water = mirage.",
+    "example": "The traveler saw a mirage.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "M-Words",
+    "word": "Munch",
+    "visual": "🍪😋",
+    "simple": "Chew steadily",
+    "hindi": "चबाना",
+    "telugu": "నమలడం",
+    "trick": "Munch = chew loudly.",
+    "example": "He munched biscuits happily.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nab",
+    "visual": "👮✋",
+    "simple": "Catch; arrest",
+    "hindi": "पकड़ना",
+    "telugu": "పట్టుకోవడం",
+    "trick": "Police nab thief.",
+    "example": "The police nabbed the robber.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nagging",
+    "visual": "😒🗣️",
+    "simple": "Complaining persistently",
+    "hindi": "बार-बार शिकायत करना",
+    "telugu": "ఎప్పుడూ ఫిర్యాదు చేయడం",
+    "trick": "Nagging = nonstop complaints.",
+    "example": "His nagging annoyed everyone.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Negligible",
+    "visual": "🔍🤏",
+    "simple": "Too small to matter",
+    "hindi": "नगण्य",
+    "telugu": "అతి చిన్న / లెక్క చేయనిది",
+    "trick": "Negligible = ignore-able.",
+    "example": "The damage was negligible.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Numismatist",
+    "visual": "🪙📚",
+    "simple": "Coin collector",
+    "hindi": "सिक्के संग्रहकर्ता",
+    "telugu": "నాణేలు సేకరించేవాడు",
+    "trick": "Numis = numbers on coins.",
+    "example": "My uncle is a numismatist.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nuptial",
+    "visual": "💍👰",
+    "simple": "Related to marriage",
+    "hindi": "विवाह संबंधी",
+    "telugu": "వివాహానికి సంబంధించిన",
+    "trick": "Nuptial = wedding word.",
+    "example": "They wore nuptial attire.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nightmare",
+    "visual": "😱🌙",
+    "simple": "Distressing dream",
+    "hindi": "भयानक सपना",
+    "telugu": "భయంకరమైన కల",
+    "trick": "Night + fear dream.",
+    "example": "He woke from a nightmare.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nudge",
+    "visual": "👉🤏",
+    "simple": "Gentle push",
+    "hindi": "हल्का धक्का",
+    "telugu": "సున్నితంగా తోసడం",
+    "trick": "Nudge = tiny push.",
+    "example": "She gave me a nudge.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nincompoop",
+    "visual": "🤪🙃",
+    "simple": "Foolish person",
+    "hindi": "मूर्ख व्यक्ति",
+    "telugu": "మూఢుడు",
+    "trick": "Funny word for fool.",
+    "example": "Don't act like a nincompoop.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nihilistic",
+    "visual": "🕳️😐",
+    "simple": "Believing life has no meaning",
+    "hindi": "निरर्थकवादी",
+    "telugu": "జీవితానికి అర్థం లేదని నమ్మే",
+    "trick": "Nothing matters = nihilistic.",
+    "example": "His nihilistic views worried friends.",
+    "pyqExams": []
+  },
+  {
+    "chapter": "N-Words",
+    "word": "Nibble",
+    "visual": "🐭🍞",
+    "simple": "Take small bites",
+    "hindi": "कुतरना / छोटे कौर खाना",
+    "telugu": "చిన్న చిన్న ముక్కలు కొరుకుట",
+    "trick": "Mouse nibbles food.",
+    "example": "The rabbit nibbled carrots.",
+    "pyqExams": []
   }
-];
-
-export default vocab;
+]
+]
