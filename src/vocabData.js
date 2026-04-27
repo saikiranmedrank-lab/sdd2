@@ -1,4 +1,4 @@
-[
+const vocab = [
   {
     "chapter": "A-Words",
     "bookNo": 1,
@@ -29563,4 +29563,6 @@
     "pyqExams": []
   }
 ]
-]
+];
+
+export default vocab;
