@@ -1,4 +1,4 @@
-const vocab = [
+[
   {
     "chapter": "A-Words",
     "bookNo": 1,
@@ -29231,6 +29231,4 @@ const vocab = [
     "example": "Without sleep you will become a zombie at work.",
     "pyqExams": []
   }
-];
-
-export default vocab;
+]
