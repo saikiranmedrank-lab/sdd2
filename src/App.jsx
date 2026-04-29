@@ -1,9 +1,25 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useTransition } from "react";
 
 import vocab from "./vocabData";
+import { GROUPS, buildGroupingSummary, enrichedVocab, enrichVocabulary } from "./vocabGroups";
 import "./App.css";
 
 const pdfRecheckPatch = [];
+
+const GROUP_LABELS = {
+  brain: "Brain",
+  emotion: "Emotion",
+  speech: "Speech",
+  movement: "Movement",
+  law: "Law",
+  battle: "Conflict",
+  social: "Social",
+  crown: "Power",
+  money: "Money",
+  skill: "Skill",
+  change: "Change",
+  nature: "Nature",
+};
 
 function loadArray(key) {
   try {
@@ -13,7 +29,7 @@ function loadArray(key) {
   }
 }
 
-function getOptions(correct, source = vocab) {
+function getOptions(correct, source = enrichedVocab) {
   const wrong = source
     .filter(v => v.word !== correct.word)
     .map(v => ({ v, r: Math.random() }))
@@ -69,7 +85,7 @@ function formatDuration(totalSeconds) {
 export default function App() {
   const allWords = useMemo(() => {
     const seen = new Map();
-    [...vocab, ...pdfRecheckPatch].forEach(item => {
+    [...enrichedVocab, ...enrichVocabulary(pdfRecheckPatch)].forEach(item => {
       const key = item.bookNo ? String(item.bookNo) : item.word.toLowerCase();
       if (!seen.has(key)) seen.set(key, item);
     });
@@ -81,12 +97,17 @@ export default function App() {
   const [studyFilter, setStudyFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [chapter, setChapter] = useState("All");
+  const [mainGroup, setMainGroup] = useState("All");
+  const [subGroup, setSubGroup] = useState("All");
+  const [viewMode, setViewMode] = useState("flashcard");
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
+  const [isFilterPending, startFilterTransition] = useTransition();
   const [index, setIndex] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [quizSettingsOpen, setQuizSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [quiz, setQuiz] = useState(vocab[0]);
-  const [options, setOptions] = useState(getOptions(vocab[0], vocab));
+  const [quiz, setQuiz] = useState(enrichedVocab[0]);
+  const [options, setOptions] = useState(getOptions(enrichedVocab[0], enrichedVocab));
   const [selected, setSelected] = useState(null);
   const [score, setScore] = useState({ correct: 0, total: 0 });
   const [restoreWord, setRestoreWord] = useState(null);
@@ -109,6 +130,7 @@ export default function App() {
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [swipePhase, setSwipePhase] = useState("idle");
   const [swipeDirection, setSwipeDirection] = useState(0);
+  const [swipeProgress, setSwipeProgress] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark-theme", theme === "dark");
@@ -119,6 +141,11 @@ export default function App() {
   const toggleTheme = () => setTheme(t => (t === "dark" ? "light" : "dark"));
 
   const chapters = useMemo(() => ["All", ...new Set(allWords.map(v => v.chapter))], [allWords]);
+  const subGroups = useMemo(() => {
+    const source = mainGroup === "All" ? allWords : allWords.filter(v => v.mainGroup === mainGroup);
+    return ["All", ...new Set(source.map(v => v.subGroup))];
+  }, [allWords, mainGroup]);
+  const groupingCheck = useMemo(() => buildGroupingSummary(vocab, allWords), [allWords]);
 
   useEffect(() => localStorage.setItem("sscLearnedWords", JSON.stringify(learned)), [learned]);
   useEffect(() => localStorage.setItem("sscWeakWords", JSON.stringify(weakWords)), [weakWords]);
@@ -144,11 +171,6 @@ export default function App() {
     localStorage.setItem("sscLastStudy", today);
   };
 
-  const markLearned = () => {
-    markStudiedToday();
-    if (!learned.includes(current.word)) setLearned([...learned, current.word]);
-  };
-
   const studySource = useMemo(() => {
     if (studyFilter === "learned") return allWords.filter(v => learned.includes(v.word));
     if (studyFilter === "weak") return allWords.filter(v => weakWords.includes(v.word));
@@ -159,12 +181,14 @@ export default function App() {
     const q = query.toLowerCase();
     return studySource.filter(v =>
       (chapter === "All" || v.chapter === chapter) &&
+      (mainGroup === "All" || v.mainGroup === mainGroup) &&
+      (subGroup === "All" || v.subGroup === subGroup) &&
       (v.word.toLowerCase().includes(q) ||
         v.simple.toLowerCase().includes(q) ||
         v.hindi.includes(query) ||
         v.telugu.includes(query))
     );
-  }, [query, chapter, studySource]);
+  }, [query, chapter, mainGroup, subGroup, studySource]);
 
   const current = filtered.length ? filtered[index % filtered.length] : vocab[0];
   const doneCount = filtered.length ? index + 1 : 0;
@@ -197,6 +221,10 @@ export default function App() {
     if (nextIndex >= 0) setIndex(nextIndex);
     setRestoreWord(null);
   }, [filtered, restoreWord]);
+
+  useEffect(() => {
+    if (filtered.length && index >= filtered.length) setIndex(0);
+  }, [filtered.length, index]);
 
   useEffect(() => {
     if (window.matchMedia("(max-width: 1040px)").matches) return;
@@ -283,6 +311,39 @@ export default function App() {
   const actualCards = allWords.length;
   const accuracy = score.total ? Math.round((score.correct / score.total) * 100) : 0;
   const studyFilterTitle = studyFilter === "weak" ? "Weak words" : studyFilter === "learned" ? "Learned words" : "All words";
+  const activeGroupMeta = GROUPS.find(group => group.mainGroup === mainGroup);
+  const groupCounts = useMemo(() => studySource.reduce((counts, item) => {
+    counts[item.mainGroup] = (counts[item.mainGroup] || 0) + 1;
+    return counts;
+  }, {}), [studySource]);
+  const difficultGroupCounts = useMemo(() => {
+    const groupByWord = new Map(allWords.map(item => [item.word, item.mainGroup]));
+    return weakWords.reduce((counts, word) => {
+      const group = groupByWord.get(word);
+      if (group) counts[group] = (counts[group] || 0) + 1;
+      return counts;
+    }, {});
+  }, [allWords, weakWords]);
+  const groupCards = useMemo(() => GROUPS.map(group => ({
+    ...group,
+    shortLabel: GROUP_LABELS[group.visualFamily] || group.visualFamily,
+    count: groupCounts[group.mainGroup] || 0,
+    difficult: difficultGroupCounts[group.mainGroup] || 0,
+  })), [groupCounts, difficultGroupCounts]);
+  const visibleListWords = useMemo(() => filtered.slice(0, 220), [filtered]);
+  const visibleQueueItems = useMemo(() => {
+    if (filtered.length <= 180) return filtered.map((item, realIndex) => ({ item, realIndex }));
+    const windowSize = 150;
+    const halfWindow = Math.floor(windowSize / 2);
+    const start = Math.max(0, Math.min(index - halfWindow, filtered.length - windowSize));
+    return filtered.slice(start, start + windowSize).map((item, offset) => ({ item, realIndex: start + offset }));
+  }, [filtered, index]);
+  const activeFilters = [
+    studyFilter !== "all" && { label: studyFilterTitle, clear: () => openStudySet("all") },
+    chapter !== "All" && { label: chapter, clear: () => updateFilters(() => setChapter("All")) },
+    mainGroup !== "All" && { label: GROUP_LABELS[activeGroupMeta?.visualFamily] || mainGroup, clear: () => updateFilters(() => { setMainGroup("All"); setSubGroup("All"); }) },
+    subGroup !== "All" && { label: subGroup, clear: () => updateFilters(() => setSubGroup("All")) },
+  ].filter(Boolean);
   const previewIndex = filtered.length && swipeDirection
     ? (index + (swipeDirection < 0 ? 1 : -1) + filtered.length) % filtered.length
     : index;
@@ -293,12 +354,44 @@ export default function App() {
   }, [allWords, chapter, learned]);
 
   const openStudySet = (filter) => {
-    setStudyFilter(filter);
-    setMode("learn");
-    setChapter("All");
-    setQuery("");
-    setIndex(0);
+    updateFilters(() => {
+      setStudyFilter(filter);
+      setMode("learn");
+      if (filter === "all") {
+        setChapter("All");
+        setMainGroup("All");
+        setSubGroup("All");
+      }
+      setQuery("");
+    });
   };
+
+  const openMemoryGroup = (groupName) => {
+    updateFilters(() => {
+      setStudyFilter("all");
+      setMode("learn");
+      setMainGroup(groupName);
+      setSubGroup("All");
+      setQuery("");
+    });
+  };
+
+  const resetFilters = () => {
+    updateFilters(() => {
+      setStudyFilter("all");
+      setChapter("All");
+      setMainGroup("All");
+      setSubGroup("All");
+      setQuery("");
+    });
+  };
+
+  function updateFilters(updater) {
+    startFilterTransition(() => {
+      updater();
+      setIndex(0);
+    });
+  }
 
   const clearLearnedWords = () => {
     setLearned([]);
@@ -327,9 +420,10 @@ export default function App() {
   const swapCard = (direction) => {
     if (swipeAnimatingRef.current || filtered.length <= 1) return;
 
-    const distance = Math.max(window.innerWidth, 420);
+    const distance = Math.max(window.innerWidth * 1.18, 460);
     swipeAnimatingRef.current = true;
     setSwipeDirection(direction);
+    setSwipeProgress(1);
     setSwipePhase("leaving");
     setSwipeOffset(direction * distance);
 
@@ -338,20 +432,19 @@ export default function App() {
         const total = Math.max(filtered.length, 1);
         return direction < 0 ? (prev + 1) % total : (prev - 1 + total) % total;
       });
-      setSwipePhase("entering");
-      setSwipeOffset(-direction * distance);
-
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => setSwipeOffset(0));
-      });
-    }, 220);
+      setSwipePhase("resetting");
+      setSwipeOffset(0);
+      setSwipeProgress(0);
+      setSwipeDirection(0);
+    }, 280);
 
     queueSwipeTimer(() => {
       swipeAnimatingRef.current = false;
       setSwipePhase("idle");
       setSwipeOffset(0);
       setSwipeDirection(0);
-    }, 500);
+      setSwipeProgress(0);
+    }, 360);
   };
 
   const handleCardTouchStart = (event) => {
@@ -361,6 +454,7 @@ export default function App() {
     setSwipePhase("dragging");
     setSwipeDirection(0);
     setSwipeOffset(0);
+    setSwipeProgress(0);
   };
 
   const handleCardTouchMove = (event) => {
@@ -373,7 +467,8 @@ export default function App() {
 
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       setSwipeDirection(deltaX < 0 ? -1 : 1);
-      setSwipeOffset(Math.max(-96, Math.min(96, deltaX)));
+      setSwipeOffset(Math.max(-160, Math.min(160, deltaX)));
+      setSwipeProgress(Math.min(Math.abs(deltaX) / 140, 1));
     }
   };
 
@@ -392,6 +487,7 @@ export default function App() {
       setSwipePhase("idle");
       setSwipeOffset(0);
       setSwipeDirection(0);
+      setSwipeProgress(0);
     }
 
     swipeStartRef.current = null;
@@ -477,7 +573,7 @@ export default function App() {
         {mode === "progress" && (
           <header className="topbar compact">
             <div className="top-actions">
-              <select value={chapter} onChange={e => { setChapter(e.target.value); setIndex(0); }} className="input">
+              <select value={chapter} onChange={e => updateFilters(() => setChapter(e.target.value))} className="input">
                 {chapters.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -503,6 +599,11 @@ export default function App() {
 
             <ProgressRow label="Course completion" value={`${progressPercent}%`} detail={`${learned.length} learned out of ${allWords.length}`} percent={progressPercent} />
 
+            <div className="grouping-check">
+              <strong>Grouping check</strong>
+              <span>{groupingCheck.totalOriginalWords} original / {groupingCheck.totalEnrichedWords} enriched / {groupingCheck.ungroupedWords.length} ungrouped</span>
+            </div>
+
             <div className="reset-actions">
               <button type="button" onClick={clearLearnedWords} disabled={!learned.length}>Clear learned words</button>
               <button type="button" onClick={clearWeakWords} disabled={!weakWords.length}>Clear weak words</button>
@@ -527,9 +628,6 @@ export default function App() {
               )}
 
               <div className="search-row">
-                <select value={chapter} onChange={e => { setChapter(e.target.value); setIndex(0); }} className="input chapter-input">
-                  {chapters.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
                 <input
                   value={query}
                   onChange={handleSearchChange}
@@ -562,6 +660,62 @@ export default function App() {
                 </div>
               </div>
 
+              <section className={isFilterPending ? "focus-toolbar is-loading" : "focus-toolbar"}>
+                <div className="focus-summary">
+                  <div>
+                    <p className="eyebrow">Study focus</p>
+                    <h2>{isFilterPending ? "Updating..." : `${filtered.length} words ready`}</h2>
+                  </div>
+                  <div className="view-toggle">
+                    <button type="button" className={viewMode === "flashcard" ? "active" : ""} onClick={() => setViewMode("flashcard")}>Cards</button>
+                    <button type="button" className={viewMode === "list" ? "active" : ""} onClick={() => setViewMode("list")}>List</button>
+                  </div>
+                </div>
+
+                <div className="active-filter-row">
+                  {activeFilters.length ? activeFilters.map(filter => (
+                    <button type="button" key={filter.label} onClick={filter.clear}>{filter.label} x</button>
+                  )) : <span>All chapters and all memory groups</span>}
+                  {activeFilters.length > 0 && <button type="button" className="clear-filters" onClick={resetFilters}>Clear all</button>}
+                </div>
+
+                <div className="quick-group-grid">
+                  <button type="button" className={mainGroup === "All" ? "active" : ""} onClick={() => updateFilters(() => { setMainGroup("All"); setSubGroup("All"); })}>All</button>
+                  {groupCards.map(group => (
+                    <button
+                      type="button"
+                      key={group.mainGroup}
+                      className={mainGroup === group.mainGroup ? "active" : ""}
+                      onClick={() => openMemoryGroup(group.mainGroup)}
+                    >
+                      <strong>{group.shortLabel}</strong>
+                      <span>{group.count}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <button type="button" className="advanced-toggle" onClick={() => setAdvancedFiltersOpen(value => !value)}>
+                  {advancedFiltersOpen ? "Hide chapter filters" : "Chapter filters"}
+                </button>
+
+                {advancedFiltersOpen && (
+                  <div className="advanced-filter-grid">
+                    <label>
+                      <span>Chapter</span>
+                      <select value={chapter} onChange={e => updateFilters(() => setChapter(e.target.value))} className="input">
+                        {chapters.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </label>
+                    <label>
+                      <span>Subgroup</span>
+                      <select value={subGroup} onChange={e => updateFilters(() => setSubGroup(e.target.value))} className="input">
+                        {subGroups.map(group => <option key={group} value={group}>{group === "All" ? "All subgroups" : group}</option>)}
+                      </select>
+                    </label>
+                  </div>
+                )}
+              </section>
+
               {settingsOpen && (
                 <div className="mobile-settings" role="dialog" aria-modal="true" aria-label="Study settings">
                   <div className="mobile-settings-card">
@@ -575,8 +729,23 @@ export default function App() {
 
                     <label className="setting-field">
                       <span>Chapter</span>
-                      <select value={chapter} onChange={e => { setChapter(e.target.value); setIndex(0); }} className="input">
+                      <select value={chapter} onChange={e => updateFilters(() => setChapter(e.target.value))} className="input">
                         {chapters.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    </label>
+
+                    <label className="setting-field">
+                      <span>Main group</span>
+                      <select value={mainGroup} onChange={e => updateFilters(() => { setMainGroup(e.target.value); setSubGroup("All"); })} className="input">
+                        <option value="All">All memory groups</option>
+                        {GROUPS.map(group => <option key={group.mainGroup} value={group.mainGroup}>{group.mainGroup}</option>)}
+                      </select>
+                    </label>
+
+                    <label className="setting-field">
+                      <span>Subgroup</span>
+                      <select value={subGroup} onChange={e => updateFilters(() => setSubGroup(e.target.value))} className="input">
+                        {subGroups.map(group => <option key={group} value={group}>{group === "All" ? "All subgroups" : group}</option>)}
                       </select>
                     </label>
 
@@ -633,7 +802,34 @@ export default function App() {
                 </div>
               )}
 
-              {filtered.length ? (
+              {filtered.length && viewMode === "list" ? (
+                <div className="study-list panel">
+                  <div className="study-list-head">
+                    <div>
+                      <p className="eyebrow">List review</p>
+                      <h2>{filtered.length} grouped words</h2>
+                    </div>
+                  </div>
+                  {visibleListWords.map((item, realIndex) => (
+                    <button
+                      type="button"
+                      key={`${item.bookNo}-${item.word}-list`}
+                      className={realIndex === index ? "study-list-item active" : "study-list-item"}
+                      onClick={() => setIndex(realIndex)}
+                    >
+                      <div>
+                        <strong>{item.word}</strong>
+                        <span>{item.simple}</span>
+                        <small>{item.mainGroup} / {item.subGroup}</small>
+                      </div>
+                      <b>{item.visual}</b>
+                    </button>
+                  ))}
+                  {filtered.length > visibleListWords.length && (
+                    <div className="render-note">Showing first {visibleListWords.length} results. Use search or a group filter to narrow this list.</div>
+                  )}
+                </div>
+              ) : filtered.length ? (
               <div
                 className={`card-carousel ${swipePhase !== "idle" ? `is-${swipePhase}` : ""}`.trim()}
                 onTouchStart={handleCardTouchStart}
@@ -644,7 +840,9 @@ export default function App() {
                   setSwipePhase("idle");
                   setSwipeOffset(0);
                   setSwipeDirection(0);
+                  setSwipeProgress(0);
                 }}
+                style={{ "--swipe-progress": swipeProgress }}
               >
                 <button className="carousel-zone carousel-prev" onClick={previousWord} aria-label="Previous word"><span>←</span></button>
                 {previewCard && (
@@ -655,7 +853,6 @@ export default function App() {
                     <div className="card-meta">
                       <span>Card {previewIndex + 1} of {filtered.length}</span>
                       <span>{previewCard.chapter}</span>
-                      {learned.includes(previewCard.word) && <span className="learned">Learned</span>}
                     </div>
                     <h2>{previewCard.word}</h2>
                     <div className="answer-grid">
@@ -675,9 +872,10 @@ export default function App() {
                   <div className="card-meta">
                     <span>Card {filtered.length ? index + 1 : 0} of {filtered.length}</span>
                     <span>{current.chapter}</span>
-                    {learned.includes(current.word) && <span className="learned">Learned</span>}
+                    <span>{current.subGroup}</span>
                   </div>
                   <h2>{current.word}</h2>
+                  <p className="group-line">{current.mainGroup}</p>
                   <div className="answer-grid">
                     <Info label="Simple" text={current.simple} />
                     {/* <Info label="Hindi" text={current.hindi} /> */}
@@ -729,7 +927,7 @@ export default function App() {
               <p className="eyebrow">Study queue</p>
               <h2>{filtered.length} cards</h2>
               <div className="queue-list">
-                {filtered.map((item, realIndex) => (
+                {visibleQueueItems.map(({ item, realIndex }) => (
                   <QueueItem
                     key={`${item.bookNo}-${item.word}`}
                     item={item}
@@ -739,6 +937,9 @@ export default function App() {
                     activeRef={realIndex === index ? activeQueueRef : null}
                   />
                 ))}
+                {filtered.length > visibleQueueItems.length && (
+                  <div className="queue-note">Showing nearby cards for faster filtering.</div>
+                )}
               </div>
             </aside>
           </section>
