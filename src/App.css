@@ -11,6 +11,10 @@
   --sidebar-text: #172033;
   --border: #d8e0ea;
   --accent: #2563eb;
+  --success: #16a34a;
+  --success-bg: #dcfce7;
+  --danger: #dc2626;
+  --danger-bg: #fee2e2;
 }
 
 .dark-theme {
@@ -22,6 +26,24 @@
   --sidebar-text: #e6eef8;
   --border: #22303f;
   --accent: #60a5fa;
+  --success: #22c55e;
+  --success-bg: rgba(34,197,94,0.08);
+  --danger: #ef4444;
+  --danger-bg: rgba(239,68,68,0.08);
+}
+
+/* Ensure current queue item is visibly highlighted in dark theme */
+.dark-theme .queue-list button.current {
+  background: rgba(96,165,250,0.12) !important;
+  border-color: var(--accent) !important;
+  color: var(--text) !important;
+}
+
+/* Slightly stronger highlight for light theme */
+.light-theme .queue-list button.current {
+  background: rgba(37,99,235,0.12) !important;
+  border-color: var(--accent) !important;
+  color: var(--text) !important;
 }
 
 .light-theme {
@@ -273,12 +295,24 @@ button.metric {
 
 .search-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 190px minmax(460px, auto);
+  /* Layout: chapter select | flexible search input | speech/settings controls */
+  /* chapter select | search input (min 150px) | speech/settings controls */
+  grid-template-columns: min-content minmax(150px, 1fr) minmax(240px, 520px);
   gap: 10px;
+  align-items: center;
+  position: sticky;
+  top: 16px;
+  z-index: 4;
+  background: transparent;
+}
+
+/* Ensure the search input has a sensible minimum width */
+.search-row .input {
+  min-width: 150px;
 }
 
 .chapter-input {
-  order: 2;
+  order: 1;
 }
 
 .speech-controls {
@@ -554,9 +588,9 @@ button.metric {
 }
 
 .info {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #f8fafc;
+  background: var(--panel-bg);
   padding: 10px 12px;
 }
 
@@ -696,9 +730,9 @@ button.metric {
 }
 
 .queue-list button {
-  border: 1px solid #e2e8f0;
-  background: #fff;
-  color: #172033;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--text);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -707,8 +741,9 @@ button.metric {
 }
 
 .queue-list button.current {
-  border-color: #2563eb;
-  background: #eff6ff;
+  border-color: var(--accent);
+  background: rgba(96,165,250,0.12);
+  color: var(--text);
 }
 
 .queue-list small {
@@ -742,13 +777,13 @@ button.metric {
 }
 
 .chip {
-  border: 1px solid #bfdbfe;
-  background: #eff6ff;
-  color: #1d4ed8;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--accent);
 }
 
 .score-pill {
-  background: #f1f5f9;
+  background: var(--panel-bg);
 }
 
 .progress-row {
@@ -759,7 +794,7 @@ button.metric {
   align-items: center;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  background: #f8fafc;
+  background: var(--panel-bg);
   padding: 14px;
 }
 
@@ -782,10 +817,10 @@ button.metric {
 
 .reset-actions button {
   min-height: 42px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: #fff;
-  color: #334155;
+  background: var(--panel-bg);
+  color: var(--text);
   padding: 0 14px;
   font-weight: 900;
 }
@@ -808,9 +843,9 @@ button.metric {
 }
 
 .word-group-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--panel-bg);
   padding: 14px;
   text-align: left;
   transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
@@ -970,9 +1005,9 @@ button.metric {
 }
 
 .options-grid button {
-  border: 1px solid #cbd5e1;
-  background: #fff;
-  color: #172033;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--text);
   min-height: 58px;
   padding: 10px 14px;
   text-align: left;
@@ -993,41 +1028,41 @@ button.metric {
   display: grid;
   flex: 0 0 34px;
   place-items: center;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 50%;
-  background: #f8fafc;
-  color: #475569;
+  background: var(--panel-bg);
+  color: var(--muted);
   font-size: 14px;
   font-weight: 900;
 }
 
 .options-grid button:hover {
-  border-color: #2563eb;
-  background: #f8fbff;
+  border-color: var(--accent);
+  background: rgba(96,165,250,0.06);
   box-shadow: 0 8px 18px rgba(37, 99, 235, 0.08);
   transform: translateY(-1px);
 }
 
 .options-grid button.correct {
-  border-color: #22c55e;
-  background: #dcfce7;
+  border-color: var(--success);
+  background: var(--success-bg);
   box-shadow: 0 18px 38px rgba(34, 197, 94, 0.18);
 }
 
 .options-grid button.correct .option-label {
-  border-color: #16a34a;
-  background: #16a34a;
+  border-color: var(--success);
+  background: var(--success);
   color: #fff;
 }
 
 .options-grid button.wrong {
-  border-color: #ef4444;
-  background: #fee2e2;
+  border-color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .options-grid button.wrong .option-label {
-  border-color: #dc2626;
-  background: #dc2626;
+  border-color: var(--danger);
+  background: var(--danger);
   color: #fff;
 }
 
@@ -1035,7 +1070,7 @@ button.metric {
   grid-area: explain;
   border-left: 4px solid #f59e0b;
   border-radius: 10px;
-  background: #fffbeb;
+  background: var(--panel-bg);
   padding: 16px;
   line-height: 1.55;
   min-height: 58px;
@@ -1047,9 +1082,9 @@ button.metric {
 
 .explain-box p,
 .explain-box span {
-  display: block;
-  margin: 8px 0 0;
-}
+  border-left: 4px solid #f59e0b;
+  border-radius: 10px;
+  background: var(--panel-bg);
 
 .explain-box .telugu-meaning {
   color: #1d4ed8;
@@ -1071,7 +1106,7 @@ button.metric {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 2;
+  z-index: 40;
   overflow: hidden;
 }
 
@@ -1194,7 +1229,7 @@ button.metric {
 
 @media (max-width: 760px) {
   body {
-    background: #f3f6fa;
+    background: var(--bg);
   }
 
   .app-shell {
@@ -1270,10 +1305,10 @@ button.metric {
     display: grid;
     place-items: center;
     min-height: 46px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border);
     border-radius: 10px;
-    background: #fff;
-    color: #172033;
+    background: var(--panel-bg);
+    color: var(--text);
     font-size: 20px;
     font-weight: 900;
   }
@@ -1378,9 +1413,9 @@ button.metric {
   .mobile-settings-card {
     align-self: start;
     width: 100%;
-    border: 1px solid #d8e0ea;
+    border: 1px solid var(--border);
     border-radius: 18px;
-    background: #fff;
+    background: var(--panel-bg);
     box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24);
     padding: 16px;
     display: grid;
@@ -1398,10 +1433,10 @@ button.metric {
 
   .mobile-nav-list button {
     min-height: 54px;
-    border: 1px solid #dbe3ee;
+    border: 1px solid var(--border);
     border-radius: 14px;
-    background: #fff;
-    color: #172033;
+    background: var(--panel-bg);
+    color: var(--text);
     font-size: 18px;
     font-weight: 900;
   }
@@ -1427,18 +1462,18 @@ button.metric {
   .settings-header button {
     width: 42px;
     height: 42px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--border);
     border-radius: 999px;
-    background: #f8fafc;
-    color: #172033;
+    background: var(--panel-bg);
+    color: var(--text);
     font-size: 28px;
     line-height: 1;
   }
 
   .setting-group {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 14px;
-    background: #f8fafc;
+    background: var(--panel-bg);
     padding: 12px;
   }
 
@@ -1450,7 +1485,7 @@ button.metric {
 
   .setting-group .speak-toggle {
     justify-content: flex-start;
-    background: #fff;
+    background: var(--panel-bg);
   }
 
   .queue {
@@ -1499,7 +1534,6 @@ button.metric {
 .speak-btn,
 .voice-select,
 .input,
-.options-grid button,
 .queue-list button,
 .word-group-card,
 .reset-actions button,
@@ -1510,7 +1544,6 @@ button.metric {
 .pill-list span,
 .quiz-header,
 .mobile-settings-card,
-.option-label,
 .info,
 .explain-box,
 .mobile-nav-list button,
@@ -1542,4 +1575,4 @@ button.metric {
 .carousel-next span {
   background: var(--accent) !important;
 }
-
+}

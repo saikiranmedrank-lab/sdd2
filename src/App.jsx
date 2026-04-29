@@ -636,7 +636,6 @@ export default function App() {
                 <div className="quiz-header">
                   <div>
                     <p className="eyebrow">Choose correct word</p>
-                    <div className="visual small">{quiz.visual}</div>
                     <h2>{quiz.simple}</h2>
                   </div>
                   <div className="quiz-meta">
@@ -686,6 +685,7 @@ export default function App() {
 
                 {selected && (
                   <div className="explain-box">
+                    {quiz.visual && <div className="visual small">{quiz.visual}</div>}
                     <strong>{quiz.word}</strong>
                     {quiz.telugu && <p className="telugu-meaning">{quiz.telugu}</p>}
                     <p>{quiz.trick}</p>
