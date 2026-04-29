@@ -108,6 +108,7 @@ export default function App() {
   const swipeTimersRef = useRef([]);
   const [swipeOffset, setSwipeOffset] = useState(0);
   const [swipePhase, setSwipePhase] = useState("idle");
+  const [swipeDirection, setSwipeDirection] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark-theme", theme === "dark");
@@ -282,6 +283,10 @@ export default function App() {
   const actualCards = allWords.length;
   const accuracy = score.total ? Math.round((score.correct / score.total) * 100) : 0;
   const studyFilterTitle = studyFilter === "weak" ? "Weak words" : studyFilter === "learned" ? "Learned words" : "All words";
+  const previewIndex = filtered.length && swipeDirection
+    ? (index + (swipeDirection < 0 ? 1 : -1) + filtered.length) % filtered.length
+    : index;
+  const previewCard = filtered.length && swipeDirection ? filtered[previewIndex] : null;
   const quizPool = useMemo(() => {
     const source = chapter === "All" ? allWords : allWords.filter(v => v.chapter === chapter);
     return source.filter(v => !learned.includes(v.word));
@@ -324,6 +329,7 @@ export default function App() {
 
     const distance = Math.max(window.innerWidth, 420);
     swipeAnimatingRef.current = true;
+    setSwipeDirection(direction);
     setSwipePhase("leaving");
     setSwipeOffset(direction * distance);
 
@@ -344,6 +350,7 @@ export default function App() {
       swipeAnimatingRef.current = false;
       setSwipePhase("idle");
       setSwipeOffset(0);
+      setSwipeDirection(0);
     }, 500);
   };
 
@@ -352,6 +359,7 @@ export default function App() {
     const touch = event.touches[0];
     swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
     setSwipePhase("dragging");
+    setSwipeDirection(0);
     setSwipeOffset(0);
   };
 
@@ -364,6 +372,7 @@ export default function App() {
     const deltaY = touch.clientY - start.y;
 
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setSwipeDirection(deltaX < 0 ? -1 : 1);
       setSwipeOffset(Math.max(-96, Math.min(96, deltaX)));
     }
   };
@@ -382,6 +391,7 @@ export default function App() {
     } else {
       setSwipePhase("idle");
       setSwipeOffset(0);
+      setSwipeDirection(0);
     }
 
     swipeStartRef.current = null;
@@ -633,9 +643,29 @@ export default function App() {
                   swipeStartRef.current = null;
                   setSwipePhase("idle");
                   setSwipeOffset(0);
+                  setSwipeDirection(0);
                 }}
               >
                 <button className="carousel-zone carousel-prev" onClick={previousWord} aria-label="Previous word"><span>←</span></button>
+                {previewCard && (
+                  <article
+                    className={`flashcard preview-card ${swipeDirection < 0 ? "preview-next" : "preview-prev"}`}
+                    aria-hidden="true"
+                  >
+                    <div className="card-meta">
+                      <span>Card {previewIndex + 1} of {filtered.length}</span>
+                      <span>{previewCard.chapter}</span>
+                      {learned.includes(previewCard.word) && <span className="learned">Learned</span>}
+                    </div>
+                    <h2>{previewCard.word}</h2>
+                    <div className="answer-grid">
+                      <Info label="Simple" text={previewCard.simple} />
+                      <Info label="Telugu" text={previewCard.telugu} />
+                      <Info label="Memory trick" text={previewCard.trick} visual={previewCard.visual} wide />
+                      <Info label="Example" text={previewCard.example} wide />
+                    </div>
+                  </article>
+                )}
                 <article
                   className="flashcard"
                   style={{
