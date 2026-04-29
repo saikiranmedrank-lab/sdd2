@@ -104,7 +104,10 @@ export default function App() {
   const speechQueueRef = useRef([]);
   const preSearchWordRef = useRef(null);
   const swipeStartRef = useRef(null);
+  const swipeAnimatingRef = useRef(false);
+  const swipeTimersRef = useRef([]);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const [swipePhase, setSwipePhase] = useState("idle");
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark-theme", theme === "dark");
@@ -207,6 +210,12 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [autoNext, mode, filtered.length, secondsPerWord]);
 
+  useEffect(() => {
+    return () => {
+      swipeTimersRef.current.forEach(timer => window.clearTimeout(timer));
+    };
+  }, []);
+
   const getPreferredVoice = (type) => {
     const savedVoice = type === "word" ? wordVoice : teluguVoice;
     const exact = voices.find(v => v.name === savedVoice);
@@ -305,10 +314,44 @@ export default function App() {
     setIndex(prev => (prev - 1 + Math.max(filtered.length, 1)) % Math.max(filtered.length, 1));
   };
 
+  const queueSwipeTimer = (callback, delay) => {
+    const timer = window.setTimeout(callback, delay);
+    swipeTimersRef.current.push(timer);
+  };
+
+  const swapCard = (direction) => {
+    if (swipeAnimatingRef.current || filtered.length <= 1) return;
+
+    const distance = Math.max(window.innerWidth, 420);
+    swipeAnimatingRef.current = true;
+    setSwipePhase("leaving");
+    setSwipeOffset(direction * distance);
+
+    queueSwipeTimer(() => {
+      setIndex(prev => {
+        const total = Math.max(filtered.length, 1);
+        return direction < 0 ? (prev + 1) % total : (prev - 1 + total) % total;
+      });
+      setSwipePhase("entering");
+      setSwipeOffset(-direction * distance);
+
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setSwipeOffset(0));
+      });
+    }, 220);
+
+    queueSwipeTimer(() => {
+      swipeAnimatingRef.current = false;
+      setSwipePhase("idle");
+      setSwipeOffset(0);
+    }, 500);
+  };
+
   const handleCardTouchStart = (event) => {
-    if (filtered.length <= 1 || event.touches.length !== 1) return;
+    if (filtered.length <= 1 || event.touches.length !== 1 || swipeAnimatingRef.current) return;
     const touch = event.touches[0];
     swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+    setSwipePhase("dragging");
     setSwipeOffset(0);
   };
 
@@ -335,12 +378,13 @@ export default function App() {
     const isHorizontalSwipe = Math.abs(deltaX) > 56 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
 
     if (isHorizontalSwipe) {
-      if (deltaX < 0) nextWord();
-      else previousWord();
+      swapCard(deltaX < 0 ? -1 : 1);
+    } else {
+      setSwipePhase("idle");
+      setSwipeOffset(0);
     }
 
     swipeStartRef.current = null;
-    setSwipeOffset(0);
   };
 
   const nextQuiz = () => {
@@ -581,12 +625,13 @@ export default function App() {
 
               {filtered.length ? (
               <div
-                className={swipeOffset ? "card-carousel is-swiping" : "card-carousel"}
+                className={`card-carousel ${swipePhase !== "idle" ? `is-${swipePhase}` : ""}`.trim()}
                 onTouchStart={handleCardTouchStart}
                 onTouchMove={handleCardTouchMove}
                 onTouchEnd={handleCardTouchEnd}
                 onTouchCancel={() => {
                   swipeStartRef.current = null;
+                  setSwipePhase("idle");
                   setSwipeOffset(0);
                 }}
               >
