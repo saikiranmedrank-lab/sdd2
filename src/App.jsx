@@ -77,6 +77,7 @@ export default function App() {
   }, []);
   const today = new Date().toDateString();
   const [mode, setMode] = useState("learn");
+  const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "dark");
   const [studyFilter, setStudyFilter] = useState("all");
   const [query, setQuery] = useState("");
   const [chapter, setChapter] = useState("All");
@@ -102,6 +103,14 @@ export default function App() {
   const activeQueueRef = useRef(null);
   const speechQueueRef = useRef([]);
   const preSearchWordRef = useRef(null);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark-theme", theme === "dark");
+    document.documentElement.classList.toggle("light-theme", theme === "light");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme(t => (t === "dark" ? "light" : "dark"));
 
   const chapters = useMemo(() => ["All", ...new Set(allWords.map(v => v.chapter))], [allWords]);
 
@@ -332,6 +341,7 @@ export default function App() {
             <p>SSC PYQ Vocab</p>
             <strong>Study Platform</strong>
           </div>
+          <button type="button" className="theme-toggle" onClick={toggleTheme} aria-label="Toggle theme">{theme === 'dark' ? '🌙' : '🌞'}</button>
         </div>
 
         <button type="button" className="mobile-menu-button" onClick={() => setMenuOpen(true)} aria-label="Open navigation menu">☰</button>

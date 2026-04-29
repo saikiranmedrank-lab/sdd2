@@ -2,10 +2,36 @@
   box-sizing: border-box;
 }
 
+:root {
+  --bg: #eef3f8;
+  --text: #172033;
+  --panel-bg: #ffffff;
+  --muted: #64748b;
+  --sidebar-bg: #f8fafc;
+  --sidebar-text: #172033;
+  --border: #d8e0ea;
+  --accent: #2563eb;
+}
+
+.dark-theme {
+  --bg: #071021;
+  --text: #dbe9fb;
+  --panel-bg: #0f1724;
+  --muted: #95a6bf;
+  --sidebar-bg: #071026;
+  --sidebar-text: #e6eef8;
+  --border: #22303f;
+  --accent: #60a5fa;
+}
+
+.light-theme {
+  /* fallback - uses root */
+}
+
 body {
   margin: 0;
-  background: #eef3f8;
-  color: #172033;
+  background: var(--bg);
+  color: var(--text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
 }
 
@@ -30,8 +56,8 @@ button {
   top: 0;
   height: 100vh;
   padding: 18px;
-  background: #101827;
-  color: #fff;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -58,7 +84,7 @@ button {
 .eyebrow,
 .goal-card span {
   margin: 0;
-  color: #64748b;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0;
@@ -86,7 +112,7 @@ button {
   border: 1px solid transparent;
   border-radius: 10px;
   background: transparent;
-  color: #cbd5e1;
+  color: var(--muted);
   text-align: left;
   padding: 0 14px;
   font-weight: 850;
@@ -94,15 +120,15 @@ button {
 
 .nav-tabs button:hover,
 .nav-tabs button.active {
-  background: #fff;
-  color: #101827;
+  background: var(--panel-bg);
+  color: var(--text);
 }
 
 .goal-card {
   margin-top: auto;
-  border: 1px solid #334155;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #172033;
+  background: var(--panel-bg);
   padding: 16px;
 }
 
@@ -123,18 +149,18 @@ button {
   height: 10px;
   overflow: hidden;
   border-radius: 999px;
-  background: #e2e8f0;
+  background: var(--border);
 }
 
 .mini-track {
   margin-top: 10px;
-  background: #334155;
+  background: var(--border);
 }
 
 .mini-track div,
 .track div {
   height: 100%;
-  background: #2563eb;
+  background: var(--accent);
 }
 
 .track div.green {
@@ -175,10 +201,10 @@ button {
 .input {
   width: 100%;
   min-height: 46px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
-  color: #172033;
+  background: var(--panel-bg);
+  color: var(--text);
   padding: 0 13px;
 }
 
@@ -196,9 +222,9 @@ button {
 .panel,
 .flashcard,
 .queue {
-  border: 1px solid #d8e0ea;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--panel-bg);
   box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
 }
 
@@ -222,7 +248,7 @@ button.metric {
 }
 
 .metric span {
-  color: #64748b;
+  color: var(--muted);
   font-size: 13px;
   font-weight: 850;
 }
@@ -268,9 +294,9 @@ button.metric {
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #eff6ff;
+  background: var(--panel-bg);
   padding: 12px 14px;
 }
 
@@ -282,10 +308,10 @@ button.metric {
 
 .study-focus-bar button {
   min-height: 40px;
-  border: 1px solid #2563eb;
+  border: 1px solid var(--accent);
   border-radius: 999px;
-  background: #fff;
-  color: #1d4ed8;
+  background: var(--panel-bg);
+  color: var(--accent);
   padding: 0 14px;
   font-weight: 900;
 }
@@ -313,10 +339,10 @@ button.metric {
 .speak-toggle,
 .voice-select {
   min-height: 46px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: #fff;
-  color: #172033;
+  background: var(--panel-bg);
+  color: var(--text);
   padding: 0 12px;
   font-weight: 850;
 }
@@ -354,9 +380,9 @@ button.metric {
   grid-template-columns: minmax(220px, 1fr) auto auto;
   gap: 12px;
   align-items: center;
-  border: 1px solid #d8e0ea;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  background: var(--panel-bg);
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.05);
   padding: 12px 14px;
 }
@@ -386,16 +412,59 @@ button.metric {
 
 .timer-toggle {
   min-height: 38px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: #fff;
-  color: #172033;
+  background: var(--panel-bg);
+  color: var(--text);
   padding: 0 13px;
   font-weight: 900;
 }
 
 .timer-range {
   min-width: 250px;
+}
+
+/* Theme-aware element backgrounds and borders */
+.panel,
+.metric,
+.flashcard,
+.queue,
+.word-group-card {
+  background: var(--panel-bg);
+  border-color: var(--border);
+}
+
+.input,
+.voice-select,
+.speak-btn,
+.primary,
+.secondary,
+.timer-toggle,
+.range-labels {
+  background: var(--panel-bg);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.nav-tabs button {
+  color: var(--muted);
+}
+
+.nav-tabs button:hover,
+.nav-tabs button.active {
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+.theme-toggle {
+  margin-left: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 8px;
+  align-self: center;
 }
 
 .timer-range input {
@@ -441,7 +510,7 @@ button.metric {
 }
 
 .card-meta span {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 999px;
   padding: 6px 10px;
 }
@@ -542,10 +611,10 @@ button.metric {
   height: 48px;
   display: grid;
   place-items: center;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: #fff;
-  color: #172033;
+  background: var(--panel-bg);
+  color: var(--text);
   font-size: 24px;
   font-weight: 900;
   line-height: 1;
@@ -585,19 +654,18 @@ button.metric {
 
 .primary,
 .secondary {
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   padding: 0 16px;
 }
 
 .primary {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
 }
-
 .secondary {
-  background: #fff;
-  color: #172033;
+  background: var(--panel-bg);
+  color: var(--text);
 }
 
 .queue {
@@ -608,6 +676,8 @@ button.metric {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
   min-height: 0;
 }
 
@@ -801,9 +871,9 @@ button.metric {
 
 .quiz-header {
   grid-area: prompt;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: var(--panel-bg);
   padding: 20px 78px 20px 22px;
   min-height: 0;
 }
@@ -853,10 +923,10 @@ button.metric {
   height: 42px;
   display: grid;
   place-items: center;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--border);
   border-radius: 50%;
-  background: #fff;
-  color: #172033;
+  background: var(--panel-bg);
+  color: var(--text);
   font-size: 18px;
   font-weight: 900;
 }
@@ -1424,3 +1494,52 @@ button.metric {
     font-size: 18px;
   }
 }
+
+/* Override remaining hard-coded light styles to follow theme variables */
+.speak-btn,
+.voice-select,
+.input,
+.options-grid button,
+.queue-list button,
+.word-group-card,
+.reset-actions button,
+.carousel-zone span,
+.chip,
+.progress-row,
+.word-groups h3 span,
+.pill-list span,
+.quiz-header,
+.mobile-settings-card,
+.option-label,
+.info,
+.explain-box,
+.mobile-nav-list button,
+.mobile-settings button {
+  background: var(--panel-bg) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+
+.queue-list button.current {
+  border-color: var(--accent) !important;
+  background: rgba(37,99,235,0.08) !important;
+}
+
+.options-grid button:hover {
+  border-color: var(--accent) !important;
+  background: rgba(96,165,250,0.06) !important;
+}
+
+.chip {
+  background: var(--panel-bg) !important;
+  color: var(--accent) !important;
+}
+
+.progress-row {
+  background: var(--panel-bg) !important;
+}
+
+.carousel-next span {
+  background: var(--accent) !important;
+}
+
