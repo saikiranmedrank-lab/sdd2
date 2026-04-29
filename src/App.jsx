@@ -103,6 +103,8 @@ export default function App() {
   const activeQueueRef = useRef(null);
   const speechQueueRef = useRef([]);
   const preSearchWordRef = useRef(null);
+  const swipeStartRef = useRef(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark-theme", theme === "dark");
@@ -301,6 +303,44 @@ export default function App() {
 
   const previousWord = () => {
     setIndex(prev => (prev - 1 + Math.max(filtered.length, 1)) % Math.max(filtered.length, 1));
+  };
+
+  const handleCardTouchStart = (event) => {
+    if (filtered.length <= 1 || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+    setSwipeOffset(0);
+  };
+
+  const handleCardTouchMove = (event) => {
+    const start = swipeStartRef.current;
+    if (!start || event.touches.length !== 1) return;
+
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      setSwipeOffset(Math.max(-96, Math.min(96, deltaX)));
+    }
+  };
+
+  const handleCardTouchEnd = (event) => {
+    const start = swipeStartRef.current;
+    if (!start) return;
+
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    const isHorizontalSwipe = Math.abs(deltaX) > 56 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+
+    if (isHorizontalSwipe) {
+      if (deltaX < 0) nextWord();
+      else previousWord();
+    }
+
+    swipeStartRef.current = null;
+    setSwipeOffset(0);
   };
 
   const nextQuiz = () => {
@@ -540,9 +580,23 @@ export default function App() {
               )}
 
               {filtered.length ? (
-              <div className="card-carousel">
+              <div
+                className={swipeOffset ? "card-carousel is-swiping" : "card-carousel"}
+                onTouchStart={handleCardTouchStart}
+                onTouchMove={handleCardTouchMove}
+                onTouchEnd={handleCardTouchEnd}
+                onTouchCancel={() => {
+                  swipeStartRef.current = null;
+                  setSwipeOffset(0);
+                }}
+              >
                 <button className="carousel-zone carousel-prev" onClick={previousWord} aria-label="Previous word"><span>←</span></button>
-                <article className="flashcard">
+                <article
+                  className="flashcard"
+                  style={{
+                    transform: swipeOffset ? `translateX(${swipeOffset}px) rotate(${swipeOffset / 36}deg)` : undefined,
+                  }}
+                >
                   <div className="card-meta">
                     <span>Card {filtered.length ? index + 1 : 0} of {filtered.length}</span>
                     <span>{current.chapter}</span>
