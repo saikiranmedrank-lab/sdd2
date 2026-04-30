@@ -939,6 +939,17 @@ button.metric {
   line-height: 1.55;
 }
 
+.simple-synonym-highlight {
+  border: 1px solid rgba(245, 158, 11, 0.42);
+  border-radius: 5px;
+  background: rgba(250, 204, 21, 0.42);
+  color: inherit;
+  padding: 0 3px;
+  font-weight: 900;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
 .trick-content {
   margin-top: 8px;
   display: grid;

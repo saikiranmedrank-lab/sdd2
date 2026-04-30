@@ -82,6 +82,45 @@ function formatDuration(totalSeconds) {
   return `${remainingSeconds}s`;
 }
 
+const SIMPLE_HIGHLIGHT_SKIP_WORDS = new Set([
+  "about", "above", "across", "after", "again", "against", "also", "among", "another", "being", "between",
+  "causing", "connected", "considered", "does", "doing", "done", "especially", "feeling", "from", "given",
+  "having", "into", "itself", "kind", "least", "made", "make", "making", "many", "more", "most", "much",
+  "often", "only", "others", "over", "part", "people", "person", "persons", "process", "quality", "regarded",
+  "related", "relating", "section", "showing", "somebody", "someone", "something", "state", "than", "that",
+  "their", "them", "then", "there", "these", "thing", "things", "this", "those", "through", "under", "used",
+  "usually", "very", "when", "where", "which", "while", "with", "without", "your",
+]);
+
+function normalizeHighlightToken(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function simpleHighlightTerms(text, word) {
+  const wordTokens = new Set(String(word || "").match(/[a-zA-Z0-9'-]+/g)?.map(normalizeHighlightToken) || []);
+  const tokens = String(text || "").match(/[a-zA-Z][a-zA-Z'-]*/g) || [];
+  return new Set(
+    tokens
+      .map(normalizeHighlightToken)
+      .filter(token =>
+        token.length >= 4 &&
+        !wordTokens.has(token) &&
+        !SIMPLE_HIGHLIGHT_SKIP_WORDS.has(token)
+      )
+  );
+}
+
+function HighlightedSimple({ text, word }) {
+  const terms = simpleHighlightTerms(text, word);
+  if (!terms.size) return text;
+
+  return String(text || "").split(/([a-zA-Z][a-zA-Z'-]*)/g).map((part, index) => {
+    const token = normalizeHighlightToken(part);
+    if (!terms.has(token)) return part;
+    return <mark className="simple-synonym-highlight" key={`${part}-${index}`}>{part}</mark>;
+  });
+}
+
 export default function App() {
   const allWords = useMemo(() => {
     const seen = new Map();
@@ -819,7 +858,7 @@ export default function App() {
                     >
                       <div>
                         <strong>{item.word}</strong>
-                        <span>{item.simple}</span>
+                        <span><HighlightedSimple text={item.simple} word={item.word} /></span>
                         <small>{item.mainGroup} / {item.subGroup}</small>
                       </div>
                       <b>{item.visual}</b>
@@ -856,7 +895,7 @@ export default function App() {
                     </div>
                     <h2>{previewCard.word}</h2>
                     <div className="answer-grid">
-                      <Info label="Simple" text={previewCard.simple} />
+                      <Info label="Simple" text={previewCard.simple} word={previewCard.word} highlightSimple />
                       <Info label="Telugu" text={previewCard.telugu} />
                       <Info label="Memory trick" text={previewCard.trick} visual={previewCard.visual} wide />
                       <Info label="Example" text={previewCard.example} wide />
@@ -877,7 +916,7 @@ export default function App() {
                   <h2>{current.word}</h2>
                   <p className="group-line">{current.mainGroup}</p>
                   <div className="answer-grid">
-                    <Info label="Simple" text={current.simple} />
+                    <Info label="Simple" text={current.simple} word={current.word} highlightSimple />
                     {/* <Info label="Hindi" text={current.hindi} /> */}
                     <Info label="Telugu" text={current.telugu} />
                     <Info label="Memory trick" text={current.trick} visual={current.visual} wide />
@@ -1045,7 +1084,7 @@ function Metric({ label, value, onClick }) {
   );
 }
 
-function Info({ label, text, visual, wide = false }) {
+function Info({ label, text, visual, wide = false, highlightSimple = false, word = "" }) {
   return (
     <div className={wide ? "info wide" : "info"}>
       <span>{label}</span>
@@ -1055,7 +1094,7 @@ function Info({ label, text, visual, wide = false }) {
           <p>{text}</p>
         </div>
       ) : (
-        <p>{text}</p>
+        <p>{highlightSimple ? <HighlightedSimple text={text} word={word} /> : text}</p>
       )}
     </div>
   );
