@@ -141,6 +141,10 @@ for (const entry of vocab) {
 
 vocab.sort((a, b) => a.bookNo - b.bookNo || a.word.localeCompare(b.word));
 
+vocab.forEach((entry, index) => {
+  entry.bookNo = index + 1;
+});
+
 const seenWords = new Set();
 const duplicateWords = [];
 for (const entry of vocab) {
